@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+Titles are terrific
+{% endblock head_title %}
+
+{% block content %}
+Welcome to PicPlace
+
+<div id='posts'>
+    Loading...
+</div>
+
+<script>
+const postsElement = document.getElementById('posts') // get an html element
+// postsElement.innerHTML = 'Loading...' // set new html in that element
+// var element1 = "<h1>Hi there 1</h1>"
+// var element2 = "<h1>Hi there 2</h1>"
+// var element3 = "<h1>Hi there 3</h1>"
+// postsElement.innerHTML = element1 + element2 + element3
+
+const xhr = new XMLHttpRequest()
+const method = 'GET'
+const url = '/posts'
+const responseType = 'json'
+
+xhr.responseType = responseType
+xhr.open(method, url)
+xhr.onload = function() {
+    const serverResponse = xhr.response
+    var listedItems = serverResponse.response // array in js or list in python
+    var finalPostStr = ""
+    for (var i = 0; i <listedItems.length; i++) {
+        console.log(i)
+        console.log(listedItems[i])
+        var currentItem = "<div class='mb-4'><h1>" + listedItems[i].id + "</h1>" + "<p>" + listedItems[i].content + "</p></div>"
+            finalPostStr += currentItem
+    }
+    postsElement.innerHTML = finalPostStr
+    console.log(listedItems)
+}
+xhr.send()
+
+</script>
+{% endblock content %}
