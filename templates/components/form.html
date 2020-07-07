@@ -1,0 +1,4 @@
+<form method='POST'> {% csrf_token %} <!--This token must be added so other sites can't pass data-->
+    {{ form.as_p}}
+    <button type='submit' class='btn btn-secondary'>Save</button>
+</form>

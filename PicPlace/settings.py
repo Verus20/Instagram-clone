@@ -26,8 +26,10 @@ SECRET_KEY = '-&u*f9vj*#-1b&hb37_=e8$+f&9%e338$ow-*zt0)yflj$21c)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# Can also add in other domains like stuff hosted on heroku or AWS
+ALLOWED_HOSTS = ['127.0.0.1']
+LOGIN_URL = "/login"
+MAX_POST_LENGTH = 2200
 
 # Application definition
 
@@ -38,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    # third-party
+    'rest_framework',
+    # internal
     'posts',
 ]
 

@@ -5,41 +5,144 @@ Titles are terrific
 {% endblock head_title %}
 
 {% block content %}
-Welcome to PicPlace
+<div class='row text-center'>
+    <div class='col'>
+        <h1>Welcome to PicPlace</h1>
+    </div>
+</div>
 
-<div id='posts'>
+<div class='row mb-3'>
+    <div class='col-md-4 mx-auto col-10'>
+        <form class='form' id='post-create-form' method='POST' action='/create-post'>
+            {% csrf_token %}
+            <div class='d-none alert alert-danger' id='post-create-form-error'></div>
+            <input type='hidden' value='/' name='next' />
+            <textarea required='required' class='form-control' name='content' placeholder='Your post..'></textarea>
+            <button type='submit' class='btn btn-primary'>Post</button>
+        </form>
+    </div>
+</div>
+
+<div class='row' id='posts'>
     Loading...
 </div>
 
 <script>
-const postsElement = document.getElementById('posts') // get an html element
-// postsElement.innerHTML = 'Loading...' // set new html in that element
-// var element1 = "<h1>Hi there 1</h1>"
-// var element2 = "<h1>Hi there 2</h1>"
-// var element3 = "<h1>Hi there 3</h1>"
-// postsElement.innerHTML = element1 + element2 + element3
 
-const xhr = new XMLHttpRequest()
-const method = 'GET'
-const url = '/posts'
-const responseType = 'json'
-
-xhr.responseType = responseType
-xhr.open(method, url)
-xhr.onload = function() {
-    const serverResponse = xhr.response
-    var listedItems = serverResponse.response // array in js or list in python
-    var finalPostStr = ""
-    for (var i = 0; i <listedItems.length; i++) {
-        console.log(i)
-        console.log(listedItems[i])
-        var currentItem = "<div class='mb-4'><h1>" + listedItems[i].id + "</h1>" + "<p>" + listedItems[i].content + "</p></div>"
-            finalPostStr += currentItem
+function handlePostFormError(msg, display) {
+    var myErrorDiv = document.getElementById("post-create-form-error")
+    if (display === true) {
+        // show error
+        myErrorDiv.setAttribute("class", "d-block alert alert-danger")
+        myErrorDiv.innerHTML = msg
     }
-    postsElement.innerHTML = finalPostStr
-    console.log(listedItems)
+
+    else {
+        // hide error
+        myErrorDiv.setAttribute("class", "d-none alert alert-danger")
+    }
 }
-xhr.send()
+
+const handlePostCreateFormDidSubmit = function (event) {
+    event.preventDefault()
+    const myForm = event.target
+    const myFormData = new FormData(myForm)
+    const url = myForm.getAttribute("action")
+    const method = myForm.getAttribute("method")
+    const xhr = new XMLHttpRequest()
+    const responseType = 'json'
+    xhr.responseType = responseType
+    xhr.open(method, url)
+    xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+    xhr.onload = function() {
+        if (xhr.status === 201) {
+            handlePostFormError("", false)
+            const newPostJson = xhr.response
+            const newPostElement = formatPostElement(newPostJson)
+            const ogHtml = postsContainerElement.innerHTML
+            postsContainerElement.innerHTML = newPostElement + ogHtml
+            myForm.reset()
+        }
+        else if (xhr.status === 400) {
+            const errorJson = xhr.response
+            const contentError = errorJson.content
+            let contentErrorMsg;
+            if (contentError) {
+                contentErrorMsg = contentError[0]
+                if (contentErrorMsg) {
+                    handlePostFormError(contentErrorMsg, true)
+                }
+                else {
+                    alert("An error occurred. Please try again.")
+                }
+            }
+            else {
+                alert("An error occurred. Please try again.")
+            }
+        }
+        else if (xhr.status === 401) {
+            alert("You must login!")
+            window.location.href = '/login'
+        }
+        else if (xhr.status === 500) {
+            alert("There was a server error. Please try again later.")
+        }
+    }
+    xhr.onerror = function() {
+        alert("An error occurred. Please try again later.")
+    }
+    xhr.send(myFormData)
+}
+
+const postCreateFormElement = document.getElementById('post-create-form')
+postCreateFormElement.addEventListener('submit', handlePostCreateFormDidSubmit)
+
+
+const postsContainerElement = document.getElementById('posts') 
+
+const loadPosts = function (postsEl) {
+    const xhr = new XMLHttpRequest()
+    const method = 'GET'
+    const url = '/posts'
+    const responseType = 'json'
+    xhr.responseType = responseType
+    xhr.open(method, url)
+    xhr.onload = function() {
+        const serverResponse = xhr.response
+        var listedItems = serverResponse.response // array in js or list in python
+        var finalPostStr = ""
+        for (var i = 0; i <listedItems.length; i++) {
+            var postObj = listedItems[i]
+            var currentItem = formatPostElement(postObj)
+            finalPostStr += currentItem
+        }
+        postsContainerElement.innerHTML = finalPostStr
+    }
+
+    xhr.send()
+}
+
+loadPosts(postsContainerElement)
+
+function handleDidLike (post_id, currentCount) {
+    console.log(post_id, currentCount)
+}
+
+// note - make the likes look like hearts
+function likeBtn(post) {
+    return "<button class='btn' style='color:red;'\
+    onclick=handleDidLike(" + post.id + "," + post.likes + ")>\
+    " + post.likes + " <i class='fa fa-heart-o' aria-hidden='true'></i></button>"
+}
+
+function formatPostElement(post) {
+    var formattedPost = "<div class=' col-4 col-md-4 mx-auto border py-3 mb-4 post' id=post-" + post.id
+    + "><p>" + post.content + 
+        "</p><div class='btn-group'>" + likeBtn(post) + 
+        "</div></div>"
+    return formattedPost
+}
 
 </script>
 {% endblock content %}

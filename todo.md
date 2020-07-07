@@ -5,6 +5,7 @@
     -> Editing
     -> Deleting
     -> Sharing
+    -> Liking
 
 2. Users
     -> Register
