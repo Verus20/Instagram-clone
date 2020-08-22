@@ -29,7 +29,9 @@ DEBUG = True
 # Can also add in other domains like stuff hosted on heroku or AWS
 ALLOWED_HOSTS = ['127.0.0.1']
 LOGIN_URL = "/login"
+
 MAX_POST_LENGTH = 2200
+POST_ACTION_OPTIONS = ["like", "unlike", "comment", "uncomment"]
 
 # Application definition
 
@@ -77,7 +79,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'PicPlace.wsgi.application'
 
 
-# Database
+# Database, can change between different databases here
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
@@ -86,6 +88,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
 
 
 # Password validation
@@ -125,3 +128,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+DEFAULT_RENDERER_CLASSES = [
+    'rest_framework.renderers.JSONRenderer',
+]
+
+if DEBUG:
+    DEFAULT_RENDERER_CLASSES += [
+        'rest_framework.renderers.BrowsableAPIRenderer'
+    ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication'
+    ],
+
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+}

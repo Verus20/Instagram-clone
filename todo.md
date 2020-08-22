@@ -1,11 +1,11 @@
-1. Pictures
+1. Posts
     -> Creating
         -> Text
         -> Image -> Media storage center
     -> Editing
     -> Deleting
     -> Sharing
-    -> Liking
+    -> Liking/Unlike
 
 2. Users
     -> Register
@@ -25,3 +25,4 @@ Long term todos
 - Notifications
 - DM
 - Explore finding hashtags or users
+- Machine learning applications (instagram bots)

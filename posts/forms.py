@@ -4,6 +4,8 @@ from .models import Post
 
 MAX_POST_LENGTH = settings.MAX_POST_LENGTH
 
+# Pure django way to send data through a form, doesn't use Django REST Framework
+# Similar to how data for a post is handled by the serializers.py file
 class PostForm(forms.ModelForm):
     # The meta class describes the entire form itself
     class Meta:
