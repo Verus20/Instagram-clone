@@ -229,12 +229,20 @@ function likeBtn(post, checkFunction) {
     }
 }
 
+function comment(post) {
+    return "<button class='btn' style='color:black;'\
+    onclick=handleDidLike(" + post.id + "," + post.likes + ",'comment'" + ")>\
+    " + post.likes +
+    " <i class='fa fa-comment' aria-hidden='true'></i></button>"
+}
+
 
 function formatPostElement(post) {
     var formattedPost = "<div class=' col-4 col-md-4 mx-auto border py-3 mb-4 post' id=post-" + post.id
     + "><p>" + post.content + 
         "</p><div class='btn-group'>" + 
-        likeBtn(post, isLike) + 
+        likeBtn(post, isLike) +
+        comment(post) +
         "</div></div>"
     return formattedPost
 }

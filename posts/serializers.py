@@ -15,6 +15,7 @@ Similar to how data for a post is handled by the forms.py file
 class PostActionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     action = serializers.CharField()
+    content = serializers.CharField(allow_blank=True, required=False)
 
     def validate_action(self, value):
         value = value.lower().strip() # turn values from "Like " -> "like"
@@ -22,8 +23,8 @@ class PostActionSerializer(serializers.Serializer):
             raise serializers.ValidationError("This is not a valid action for posts")
         return value
 
-# Serializer for getting data from a post made by a user
-class PostSerializer(serializers.ModelSerializer):
+# Serializer for creating posts
+class PostCreateSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Post
@@ -38,6 +39,18 @@ class PostSerializer(serializers.ModelSerializer):
         if len(value) > MAX_POST_LENGTH:
             raise serializers.ValidationError("This post is too long")
         return value
+
+# Serializer for getting data from a post made by a user
+class PostSerializer(serializers.ModelSerializer):
+    likes = serializers.SerializerMethodField(read_only=True)
+    parent = PostCreateSerializer(read_only=True)
+
+    class Meta:
+        model = Post
+        fields = ['id', 'content', 'likes', 'is_comment', "parent"]
+    
+    def get_likes(self, obj):
+        return obj.likes.count()
 
 # Serializer for getting data from a like made on a post by a user
 class PostLikeSerializer(serializers.ModelSerializer):

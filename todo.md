@@ -1,11 +1,15 @@
 1. Posts
-    -> Creating
-        -> Text
+    -> Creating X
+        -> Text X
         -> Image -> Media storage center
+    -> Liking/Unlike X
+    -> Comments
+        -> Read only serializer
+        -> Create only serializer
     -> Editing
     -> Deleting
     -> Sharing
-    -> Liking/Unlike
+    
 
 2. Users
     -> Register
