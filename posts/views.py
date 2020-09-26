@@ -10,7 +10,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .forms import PostForm
 from .models import Post, PostLike, Test
-from .serializers import PostSerializer, PostActionSerializer, PostLikeSerializer, TestSerializer
+from .serializers import (
+    PostSerializer, 
+    PostActionSerializer,
+    PostCreateSerializer, 
+    PostLikeSerializer, 
+    TestSerializer
+)
 
 ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
@@ -30,7 +36,7 @@ def home_view(request, *args, **kwargs):
 # @authentication_classes([])
 @permission_classes([IsAuthenticated])
 def post_create_view(request, *args, **kwargs):
-    serializer = PostSerializer(data=request.POST)
+    serializer = PostCreateSerializer(data=request.POST)
     if serializer.is_valid(raise_exception=True):
         serializer.save(user=request.user)
         return Response(serializer.data, status=201)
@@ -58,6 +64,7 @@ def post_action_view(request, *args, **kwargs):
         data = serializer.validated_data
         post_id = data.get("id")
         action = data.get("action")
+        content = data.get("content")
         qs = Post.objects.filter(id=post_id)
         if not qs.exists():
             return Response({}, status=404)
@@ -65,17 +72,17 @@ def post_action_view(request, *args, **kwargs):
         test = Post.objects.filter(id=post_id)
         if action == "like":
             obj.likes.add(request.user)
-            obj.likeCounter = 1
-            obj.save()
             serializer = PostSerializer(obj)
             return Response(serializer.data, status=200)
         elif action == 'unlike':
             obj.likes.remove(request.user)
-            obj.likeCounter = 0
-            obj.save()
         elif action == "comment":
-            # to do for creating a comment on someone's post
-            pass
+            new_comment = Post.objects.create(
+                user=request.user, 
+                parent=obj,
+                content=content,)
+            serializer = PostSerializer(new_comment)
+            return Response(serializer.data, status=200)
         elif action == "uncomment":
             # to do for uncommenting (delete a comment) on someone's post
             pass    

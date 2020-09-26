@@ -24,6 +24,8 @@ class Post(models.Model):
     """
     # Maps to SQL Data
     # # id = models.AutoField(primary_key=True) 
+    # this means if the comment on the post is deleleted, then the parent is set to NULL
+    parent = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
     user = models.ForeignKey(User, on_delete=models.CASCADE) # many users can have many posts
     # through option is to allow for the timestamp functionality to work
     # it allows users to see when a post was created
@@ -38,6 +40,12 @@ class Post(models.Model):
     class Meta:
         ordering = ['-id']
 
+    @property
+    def is_comment(self):
+        return self.parent != None
+
+
+    # Not needed anymore
     def serialize(self):
         return {
             "id": self.id,
