@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path, include # url()
 
 from posts.views import (
     home_view, 
@@ -22,6 +22,7 @@ from posts.views import (
     post_detail_view, 
     post_list_view,
     postlike_list_view,
+    post_delete_view,
     post_create_view,
     test_view
 )
@@ -33,6 +34,7 @@ urlpatterns = [
     path('posts', post_list_view),
     path('postlikes', postlike_list_view),
     path('posts/<int:post_id>', post_detail_view),
-    path('api/posts/action', post_action_view),
-    path('stuff', test_view)
+    path('posts/<int:post_id>/delete', post_delete_view),
+    path('stuff', test_view),
+    path('api/posts/', include('posts.urls')),
 ]

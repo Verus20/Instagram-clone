@@ -53,6 +53,19 @@ def post_detail_view(request, post_id, *args, **kwargs):
 
 @api_view(['DELETE', 'POST'])
 @permission_classes([IsAuthenticated])
+def post_delete_view(request, post_id, *args, **kwargs):
+    qs = Post.objects.filter(id=post_id)
+    if not qs.exists():
+        return Response({}, status=404)
+    qs = qs.filter(user=request.user)
+    if not qs.exists():
+        return Response({"message": "You cannot delete this post"}, status=401)
+    obj = qs.first()
+    obj.delete()
+    return Response({"message: Post removed"}, status=200)
+
+@api_view(['DELETE', 'POST'])
+@permission_classes([IsAuthenticated])
 def post_action_view(request, *args, **kwargs):
     """
     id is required
@@ -76,13 +89,16 @@ def post_action_view(request, *args, **kwargs):
             return Response(serializer.data, status=200)
         elif action == 'unlike':
             obj.likes.remove(request.user)
+            serializer = PostSerializer(obj)
+            return Response(serializer.data, status=200)
         elif action == "comment":
             new_comment = Post.objects.create(
                 user=request.user, 
                 parent=obj,
-                content=content,)
+                content=content,
+                )
             serializer = PostSerializer(new_comment)
-            return Response(serializer.data, status=200)
+            return Response(serializer.data, status=201)
         elif action == "uncomment":
             # to do for uncommenting (delete a comment) on someone's post
             pass    
