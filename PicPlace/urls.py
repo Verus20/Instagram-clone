@@ -18,12 +18,14 @@ from django.urls import path
 
 from posts.views import (
     home_view, 
+    home2_view,
     post_action_view,
     post_detail_view, 
     post_list_view,
     postlike_list_view,
     post_create_view,
-    test_view
+    test_view,
+    user_detail_view,
 )
 
 urlpatterns = [
@@ -34,5 +36,7 @@ urlpatterns = [
     path('postlikes', postlike_list_view),
     path('posts/<int:post_id>', post_detail_view),
     path('api/posts/action', post_action_view),
-    path('stuff', test_view)
+    path('stuff', test_view),
+    path('posts/<str:user_username>', user_detail_view),
+    path('<str:user_username>', home2_view),
 ]

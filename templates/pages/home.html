@@ -122,13 +122,22 @@ const handlePostCreateFormDidSubmit = function (event) {
 const postCreateFormElement = document.getElementById('post-create-form')
 postCreateFormElement.addEventListener('submit', handlePostCreateFormDidSubmit)
 
-
-const postsContainerElement = document.getElementById('posts') 
+const postsContainerElement = document.getElementById('posts')
 
 const loadPosts = function (postsEl) {
     const xhr = new XMLHttpRequest()
     const method = 'GET'
-    const url = '/posts'
+    //Remember disparity between Python "True/False" and Javascript "true/false"
+    //Just turning view "context" into string for now
+    if ("{{filter_user}}" == "False") {
+        url = '/posts'
+    }
+    else {
+        url_string = '/posts/' + '{{user_name}}' + ''
+        url = url_string
+        console.log(url)
+    }
+    //const url = '/posts'
     const responseType = 'json'
     xhr.responseType = responseType
     xhr.open(method, url)
@@ -202,9 +211,6 @@ function isLike() {
 
 // note - make the likes look like hearts
 function likeBtn(post, checkFunction) {
-// FIX USER "NONE" ON LIKE BUTTON LOADING
-// TRY PASSING USER AUTHENTICATION THROUGH VIEWS?
-// OR ALLOW USER TO BE NONE?
     True = true
     False = false
     if ({{user.is_anonymous}}) {

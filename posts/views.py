@@ -24,7 +24,18 @@ def test_view(request, *args, **kwargs):
 # Home page view, renders the home page to url shown below
 def home_view(request, *args, **kwargs):
     print(request.user or None)
-    return render(request, "pages/home.html", context={}, status=200)
+    context = {
+        "filter_user": "False"
+    }
+    return render(request, "pages/home.html", context, status=200)
+
+def home2_view(request, user_username, *args, **kwargs):
+    print(request.user or None)
+    context = {
+        "filter_user": "True",
+        "user_name": user_username
+    }
+    return render(request, "pages/home.html", context, status=200)
 
 @api_view(['POST']) # http method the client will send is POST
 # @authentication_classes([])
@@ -92,6 +103,13 @@ def postlike_list_view(request, *args, **kwargs):
     qs_like = PostLike.objects.all()
     like_serializer = PostLikeSerializer(qs_like, many=True)
     return Response(like_serializer.data)
+
+@api_view(['GET'])
+def user_detail_view(request, user_username, *args, **kwargs):
+    qs = Post.objects.all()
+    qs = Post.objects.filter(user__username__iexact = user_username)
+    serializer = PostSerializer(qs, many = True)
+    return Response(serializer.data)
 
 def post_create_view_pure_django(request, *args, **kwargs):
     """
